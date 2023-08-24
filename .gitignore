@@ -1,0 +1,9 @@
+.DS_Store
+*~
+.*~
+.vagrant
+collections
+log
+roles
+.cache
+.retry

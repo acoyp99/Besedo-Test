@@ -1,13 +1,30 @@
-# devops.technical-tests
+# Technical Test Solution - Arley Coy
 
-Welcome to this technical test for a DevOps Engineer role!
+This repository provides solutions for the technical test, covering the following aspects:
 
-This test is designed to evaluate your skills and experience in various aspects of the role, including Virtualization, AWS Cloud management, Continuous Integration/Continuous Deployment (CI/CD), Infrastructure as Code (IaC), incident management, among others.
+- CI/CD
+- Containerization
+- Infrastructure as Code
+- Provisioning
+- Incident Response
 
-The test is structured into several folders, each corresponding to a specific aspect of the role. Each folder contains a set of tasks that we are asking you to complete. The idea, is to deploy three micro-services, a frontend (`Ariane`), a backend (`Falcon`) and a Redis (`redis`).
+Below are detailed explanations, diagrams, code examples, and steps to follow for each section.
 
-Please note that it is not essential to complete every task. The aim is to do your best and try to complete as many tasks as possible within the time allowed. Your ability to prioritize and manage your time will also be evaluated.
+---
 
-We hope you find this test challenging and interesting. 
+## CI/CD
 
-Good luck!
+### Explanation:
+
+Continuous Integration and Continuous Deployment (CI/CD) facilitate automatic testing and deployment of code changes.
+
+### Diagram:
+
+![CI/CD Process](path/to/cicd-diagram.png)
+
+### Code:
+
+```bash
+# Sample CI/CD script (e.g., .gitlab-ci.yml, .circleci/config.yml, Jenkinsfile, etc.)
+# ... (include your CI/CD configuration here)
+```

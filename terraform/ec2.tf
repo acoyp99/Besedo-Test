@@ -15,15 +15,16 @@ resource "aws_iam_role" "ec2_role" {
 
 resource "aws_instance" "example" {
   count = 2
-
+  key_name      = "besedo-key" # Create the key pair with CLI and replace the name
   ami           = "ami-06be7c79234a3be48" # Change this to your desired AMI
   instance_type = "t2.micro"
   subnet_id     = aws_subnet.private.id
   iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
-  vpc_security_group_ids = [aws_security_group.ec2_sg.id]
+  vpc_security_group_ids = [aws_security_group.ec2_ssh_sg.id]
+  user_data = file("${path.module}/user-data-script.sh")
 
   tags = {
-    Name = "example-instance"
+    Name = "worker-node-${count.index}"
   }
 }
 

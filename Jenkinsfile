@@ -9,7 +9,6 @@ pipeline {
         string(name: 'ECR_REGISTRY', defaultValue: '443865706014.dkr.ecr.us-east-1.amazonaws.com',  description: 'ECR Registry URL')
         choice(
             choices: ['us-east-1', 'us-west-2', 'eu-west-1', 'ap-southeast-1', 'ap-northeast-1', 'Other (please specify)'],
-            defaultValue: 'us-east-1',
             description: 'Choose an AWS region or select "Other" and specify your region in the text field below.',
             name: 'AWS_REGION_CHOICE'
         )

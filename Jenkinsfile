@@ -63,11 +63,11 @@ pipeline {
                     aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${params.ECR_REGISTRY}
                     """
                     sh '''
-                    aws ecr describe-repositories --repository-names frontend-ariane --region $AWS_REGION > /dev/null 2>&1
+                    aws ecr describe-repositories --repository-names frontend-ariane --region $AWS_REGION>/dev/null 2>&1
                     if [ $? -ne 0 ]; then
                     aws ecr create-repository --repository-name frontend-ariane --region $AWS_REGION
                     fi
-                    aws ecr describe-repositories --repository-names frontend-ariane --region $AWS_REGION > /dev/null 2>&1
+                    aws ecr describe-repositories --repository-names frontend-ariane --region $AWS_REGION>/dev/null 2>&1
                     if [ $? -ne 0 ]; then
                     aws ecr create-repository --repository-name frontend-ariane --region $AWS_REGION
                     fi

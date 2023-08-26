@@ -35,13 +35,18 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
                 script {
-
-                    sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
-                    
+                    withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: "${params.AWS_CREDENTIALS_ID}",
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                    ]]) {
+                    sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${params.ECR_REGISTRY}"
+                    }
                     // For frontend:
                     dir("frontend-ariane/") {
                         FRONTEND_VERSION = readFile('VERSION').trim()
-                        FRONTEND_IMAGE = "${ECR_REGISTRY}/frontend-image:${FRONTEND_VERSION}"
+                        FRONTEND_IMAGE = "${params.ECR_REGISTRY}/frontend-image:${FRONTEND_VERSION}"
                         
                         docker.build("${FRONTEND_IMAGE}").push()
                     }
@@ -49,7 +54,7 @@ pipeline {
                     // For backend:
                     dir("backend-falcon/") {
                         BACKEND_VERSION = readFile('VERSION').trim()
-                        BACKEND_IMAGE = "${ECR_REGISTRY}/backend-image:${BACKEND_VERSION}"
+                        BACKEND_IMAGE = "${params.ECR_REGISTRY}/backend-image:${BACKEND_VERSION}"
                         
                         docker.build("${BACKEND_IMAGE}").push()
                     }
@@ -60,7 +65,12 @@ pipeline {
         stage('Deploy on Kubernetes') {
             steps {
                 script {
-                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'your-aws-credentials-id']]) {
+                    withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: "${params.AWS_CREDENTIALS_ID}",
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                    ]]) {
                         // Check if Redis app exists
                         if (sh(script: "kubectl --kubeconfig ${KUBECONFIG_PATH} get deployments | grep redis-app", returnStatus: true) != 0) {
                             // If not, run the Redis Dockerfile
@@ -93,15 +103,15 @@ pipeline {
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'your-aws-credentials-id']]) {
                         if (userInput == 'Frontend' || userInput == 'Both') {
                             // Rollback frontend to a previous version, say v1
-                            def FRONTEND_OLD_IMAGE = "${ECR_REGISTRY}/frontend-image:v1"
-                            sh "sed -i 's|${ECR_REGISTRY}/frontend-image:.*|${FRONTEND_OLD_IMAGE}|' frontend-ariane/kubernetes-deployment.yaml"
+                            def FRONTEND_OLD_IMAGE = "${params.ECR_REGISTRY}/frontend-image:v1"
+                            sh "sed -i 's|${params.ECR_REGISTRY}/frontend-image:.*|${FRONTEND_OLD_IMAGE}|' frontend-ariane/kubernetes-deployment.yaml"
                             sh "kubectl --kubeconfig ${KUBECONFIG_PATH} apply -f frontend-ariane/kubernetes-deployment.yaml"
                         }
                         
                         if (userInput == 'Backend' || userInput == 'Both') {
                             // Rollback backend to a previous version, say v1
-                            def BACKEND_OLD_IMAGE = "${ECR_REGISTRY}/backend-image:v1"
-                            sh "sed -i 's|${ECR_REGISTRY}/backend-image:.*|${BACKEND_OLD_IMAGE}|' backend-falcon/kubernetes-deployment.yaml"
+                            def BACKEND_OLD_IMAGE = "${params.ECR_REGISTRY}/backend-image:v1"
+                            sh "sed -i 's|${params.ECR_REGISTRY}/backend-image:.*|${BACKEND_OLD_IMAGE}|' backend-falcon/kubernetes-deployment.yaml"
                             sh "kubectl --kubeconfig ${KUBECONFIG_PATH} apply -f backend-falcon/kubernetes-deployment.yaml"
                         }
                     }

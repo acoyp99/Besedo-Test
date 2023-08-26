@@ -8,3 +8,4 @@ roles
 .cache
 .retry
 .gitignore
+jenkins

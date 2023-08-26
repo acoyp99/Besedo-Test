@@ -45,8 +45,8 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
                 script {
-                    // Authenticate Docker to ECR
-                    sh "$(aws ecr get-login --no-include-email --region us-east-1)"
+
+                    sh "$(aws ecr get-login-password --region us-east-1)"
                     
                     // For frontend:
                     dir("frontend-ariane/") {

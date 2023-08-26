@@ -7,3 +7,4 @@ log
 roles
 .cache
 .retry
+.gitignore

@@ -4,23 +4,13 @@ pipeline {
     environment {
         KUBECONFIG_PATH = "/path/to/kubeconfig"
     }
+    parameters {
+        string(name: 'AWS_CREDENTIALS_ID', defaultValue: 'aws-fernando', description: 'AWS Credentials ID for ECR and other AWS services')
+        string(name: 'ECR_REGISTRY', defaultValue: '443865706014.dkr.ecr.us-east-1.amazonaws.com',  description: 'ECR Registry URL')
+    }
 
     stages {
-        stage('Input Parameters') {
-            steps {
-                script {
-                    def userInput = input(
-                        id: 'userInput', message: 'Enter AWS and ECR details:',
-                        parameters: [
-                            string(defaultValue: 'aws-fernando', description: 'AWS Credentials ID', name: 'AWS_CREDENTIALS_ID'),
-                            string(defaultValue: '443865706014.dkr.ecr.us-east-1.amazonaws.com', description: 'ECR Registry URL', name: 'ECR_REGISTRY')
-                        ])
 
-                    env.AWS_CREDENTIALS_ID = userInput['AWS_CREDENTIALS_ID']
-                    env.ECR_REGISTRY = userInput['ECR_REGISTRY']
-                }
-            }
-        }
         stage('Compilation & Tests') {
             parallel {
                 stage('Frontend Compilation & Tests') {

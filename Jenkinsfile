@@ -90,33 +90,33 @@ pipeline {
         }
         
         stage('Rollback Option') {
-        steps {
-            script {
-                def userInput = input message: 'Do you want to rollback?', 
-                                     parameters: [
-                                         choice(choices: ['No', 'Frontend', 'Backend', 'Both'], 
-                                                description: 'Select which deployment to rollback?', 
-                                                name: 'rollbackChoice')
-                                     ]
-                
-                // If confirmed, rollback based on choice
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'your-aws-credentials-id']]) {
-                    if (userInput == 'Frontend' || userInput == 'Both') {
-                        // Rollback frontend to a previous version, say v1
-                        def FRONTEND_OLD_IMAGE = "${ECR_REGISTRY}/frontend-image:v1"
-                        sh "sed -i 's|${ECR_REGISTRY}/frontend-image:.*|${FRONTEND_OLD_IMAGE}|' frontend-ariane/kubernetes-deployment.yaml"
-                        sh "kubectl --kubeconfig ${KUBECONFIG_PATH} apply -f frontend-ariane/kubernetes-deployment.yaml"
-                    }
+            steps {
+                script {
+                    def userInput = input message: 'Do you want to rollback?', 
+                                        parameters: [
+                                            choice(choices: ['No', 'Frontend', 'Backend', 'Both'], 
+                                                    description: 'Select which deployment to rollback?', 
+                                                    name: 'rollbackChoice')
+                                        ]
                     
-                    if (userInput == 'Backend' || userInput == 'Both') {
-                        // Rollback backend to a previous version, say v1
-                        def BACKEND_OLD_IMAGE = "${ECR_REGISTRY}/backend-image:v1"
-                        sh "sed -i 's|${ECR_REGISTRY}/backend-image:.*|${BACKEND_OLD_IMAGE}|' backend-falcon/kubernetes-deployment.yaml"
-                        sh "kubectl --kubeconfig ${KUBECONFIG_PATH} apply -f backend-falcon/kubernetes-deployment.yaml"
+                    // If confirmed, rollback based on choice
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'your-aws-credentials-id']]) {
+                        if (userInput == 'Frontend' || userInput == 'Both') {
+                            // Rollback frontend to a previous version, say v1
+                            def FRONTEND_OLD_IMAGE = "${ECR_REGISTRY}/frontend-image:v1"
+                            sh "sed -i 's|${ECR_REGISTRY}/frontend-image:.*|${FRONTEND_OLD_IMAGE}|' frontend-ariane/kubernetes-deployment.yaml"
+                            sh "kubectl --kubeconfig ${KUBECONFIG_PATH} apply -f frontend-ariane/kubernetes-deployment.yaml"
+                        }
+                        
+                        if (userInput == 'Backend' || userInput == 'Both') {
+                            // Rollback backend to a previous version, say v1
+                            def BACKEND_OLD_IMAGE = "${ECR_REGISTRY}/backend-image:v1"
+                            sh "sed -i 's|${ECR_REGISTRY}/backend-image:.*|${BACKEND_OLD_IMAGE}|' backend-falcon/kubernetes-deployment.yaml"
+                            sh "kubectl --kubeconfig ${KUBECONFIG_PATH} apply -f backend-falcon/kubernetes-deployment.yaml"
+                        }
                     }
                 }
             }
         }
     }
 }
- 

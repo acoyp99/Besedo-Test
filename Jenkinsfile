@@ -41,6 +41,7 @@ pipeline {
                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                     ]]) {
+                    sh "echo ${params.ECR_REGISTRY}"
                     sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${params.ECR_REGISTRY}"
                     }
                     // For frontend:
@@ -118,5 +119,4 @@ pipeline {
                 }
             }
         }
-    }
 }

@@ -59,7 +59,7 @@ pipeline {
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                     ]]) {
                     sh '''
-                    echo ${params.ECR_REGISTRY}"
+                    echo ${params.ECR_REGISTRY}
                     aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${params.ECR_REGISTRY}
                     aws ecr describe-repositories --repository-names frontend-ariane --region $AWS_REGION > /dev/null 2>&1
                     if [ ${?} -ne 0 ]; then

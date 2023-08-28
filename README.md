@@ -242,8 +242,6 @@ For this requirement there is a drafted document in the solution folder addresse
 
 ## Infrastructure as Code
 
-# AWS Terraform Setup
-
 This Terraform setup provisions infrastructure on AWS with a specific focus on VPC, EC2, Elasticache, and S3 configurations.
 
 ## Infrastructure Components
@@ -285,7 +283,7 @@ To accomplish the deployment process there is necessary to provision two other r
 > [!IMPORTANT]
 > Also there is a necessary to provide a master node for managing the Kubernetes cluster with `kops` tool.
 
-## Prerequisites
+### Prerequisites
 
 - [Terraform](https://www.terraform.io/downloads.html) installed.
 - AWS credentials set up either via the AWS CLI or environment variables.
@@ -304,6 +302,57 @@ To accomplish the deployment process there is necessary to provision two other r
 - Always verify AWS resource limits to ensure you can provision the desired resources.
 - Familiarize yourself with AWS's pricing model to avoid unexpected costs.
 - Remember to destroy resources post-testing to avoid unnecessary AWS charges.
+
+## Provisioning (Ansible Playbook)
+
+To accomplish the requirement the tool to be used will be **Ansible playbook** automates several system configurations and tasks including:
+
+- Setting system open file limits.
+- User account creation with associated SSH keys.
+- Docker package installation and container execution.
+- Nginx installation and configuration to forward requests.
+
+### Structure
+
+- **`site.yml`**: This is the main playbook that orchestrates the execution of different roles.
+- **`roles/`**: Contains specific roles and tasks:
+  - **`system_config`**: Sets system-wide configurations.
+  - **`user_setup`**: Manages user accounts, SSH keys, and user info files.
+  - **`docker`**: Handles Docker installation and container execution.
+  - **`nginx`**: Installs and configures Nginx.
+
+### Prerequisites
+
+1. Ansible installed on your machine or Ansible control node.
+2. Properly configured Ansible hosts file (`/etc/ansible/hosts`).
+3. `ansible-vault` for encrypting sensitive data.
+
+### Getting Started
+
+1. Access to the Ansible folder:
+
+   ```bash
+   cd Ansible
+   ```
+
+2. Encrypt user passwords using `ansible-vault`:
+
+   ```bash
+   ansible-vault encrypt_string 'USER_PASSWORD' --name 'passwd'
+   ```
+
+   Replace `USER_PASSWORD` with the actual password. Copy the output to the `roles/user_setup/vars/main.yml` file.
+
+3. Run the playbook:
+   ```bash
+   ansible-playbook site.yml --ask-vault-pass
+   ```
+
+### Notes
+
+- Ensure your target hosts are correctly specified in the Ansible hosts file.
+- Always review and adjust the playbook and roles to better fit your specific environment and requirements.
+- It's recommended to test the playbook in a staging environment before deploying in production.
 
 ## Troubleshooting
 

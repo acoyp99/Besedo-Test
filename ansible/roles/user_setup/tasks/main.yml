@@ -1,0 +1,31 @@
+---
+- name: Create user accounts
+  user:
+    name: "{{ item.login }}"
+    password: "{{ item.passwd | password_hash('sha512') }}"
+    groups: "{{ item.groups | join(',') }}"
+    generate_ssh_key: yes
+    ssh_key_file: ".ssh/id_rsa"
+  with_dict: "{{ user_accounts }}"
+
+- name: Add SSH keys for users
+  authorized_key:
+    user: "{{ item.login }}"
+    key: "{{ item.ssh_keys }}"
+  with_dict: "{{ user_accounts }}"
+
+- name: Create info files for users
+  copy:
+    dest: "/home/{{ item.login }}/info"
+    content: |
+      Name: {{ item.name }}
+      Mail: {{ item.mail }}
+      Position: {{ item.position }}
+      Office: {{ item.office }}
+  with_dict: "{{ user_accounts }}"
+
+- name: Download prrtprrt.txt and copy to each user home directory
+  get_url:
+    url: "https://gist.githubusercontent.com/slgevens/aa9a2fc52cb5fef8b41c1b11a8b7d3e3/raw/dc1e3e288967bd4818277e4688d1daf615225337/prrtprrt.txt"
+    dest: "/home/{{ item.login }}/prrtprrt.txt"
+  with_dict: "{{ user_accounts }}"

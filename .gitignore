@@ -4,7 +4,6 @@
 .vagrant
 collections
 log
-roles
 .cache
 .retry
 .gitignore

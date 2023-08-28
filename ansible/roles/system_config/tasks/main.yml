@@ -1,0 +1,7 @@
+---
+- name: Set open file limit for root
+  pam_limits:
+    domain: root
+    limit_type: '-'
+    limit_item: nofile
+    value: 65536

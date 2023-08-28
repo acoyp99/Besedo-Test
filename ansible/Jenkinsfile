@@ -12,9 +12,9 @@ pipeline {
                 script {
                     // Run Ansible playbook
                     ansiblePlaybook(
-                        credentialsId: 'your_ssh_key_credentials_id',
-                        inventory: 'path_to_inventory.ini',
-                        playbook: 'path_to_provision_users.yml'
+                        credentialsId: 'ansible-credentials',
+                        inventory: './inventory.ini',
+                        playbook: './provision_users.yml'
                     )
                 }
             }

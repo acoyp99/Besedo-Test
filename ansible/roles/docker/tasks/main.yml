@@ -1,0 +1,12 @@
+---
+- name: Install Docker
+  apt:
+    name: docker.io
+    state: present
+
+- name: Run the docker container
+  docker_container:
+    name: happy_roentgen
+    image: public.ecr.aws/q0x2y8f9/nginx-demo
+    ports:
+      - "55000:55000"

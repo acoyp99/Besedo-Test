@@ -4,6 +4,9 @@
 .vagrant
 collections
 log
-roles
 .cache
 .retry
+.gitignore
+jenkins
+*.pem
+*.terraform*

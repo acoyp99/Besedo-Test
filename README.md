@@ -232,20 +232,79 @@ users:
       client-key-data: BASE64_ENCODED_CLIENT_KEY
 ```
 
+- `certificate-authority-data`: This is your **CA certificate** used to validate the server's certificate. It needs to be base64 encoded.
+- `server`: The server URL is where your Kubernetes API server is running. If you're running the API server on an **EC2 instance with an Elastic IP**, replace **YOUR_ELASTIC_IP** with the actual IP.
+- `client-certificate-data` & `client-key-data`: These are used for client authentication against the server. They also need to be **base64** encoded.
+
 ## Incident Response Scenario
 
 For this requirement there is a drafted document in the solution folder addressed as README.md [incident-response-scenario](steps-to-solve-incident/README.md)
 
 ## Infrastructure as Code
 
+# AWS Terraform Setup
+
+This Terraform setup provisions infrastructure on AWS with a specific focus on VPC, EC2, Elasticache, and S3 configurations.
+
+## Infrastructure Components
+
+- **VPC**:
+
+  - **Internet Gateway** for public web access.
+  - **NAT Gateway** located within the public subnet to grant private subnet instances internet access.
+  - A public and a private subnet.
+  - An associated Elastic IP for the NAT Gateway.
+  - Proper routing configurations for both subnets.
+  - Security groups to regulate inbound and outbound traffic.
+
+- **EC2**:
+
+  - Two instances residing within the private subnet.
+  - IAM role to facilitate communication between instances.
+
+- **Elasticache**:
+
+  - Redis instance residing in the private subnet.
+  - Associated security group to permit traffic on port `6379`.
+
+- **S3 Bucket**:
+  - Named `prrtprrt-arley` (replace `arley` with your actual name).
+  - Versioning enabled.
+  - Server-side encryption activated with a custom key aliased as `prrtprrt-arley`.
+
+To accomplish the deployment process there is necessary to provision two other resources which are **Application Locad Balancer** and **Elastic Container Registry** to configure the access to the app and manage the image storing. These resources can be provided manually
+
+- **Application Load Balancer (ALB)**:
+
+  - Configured to route external traffic to the Kubernetes applications running on the worker nodes.
+
+- **Elastic Container Registry (ECR)**:
+  - A Docker image registry for storing and managing application container images.
+  - Images from ECR can be deployed to the Kubernetes worker nodes.
+
+> [!IMPORTANT]
+> Also there is a necessary to provide a master node for managing the Kubernetes cluster with `kops` tool.
+
+## Prerequisites
+
+- [Terraform](https://www.terraform.io/downloads.html) installed.
+- AWS credentials set up either via the AWS CLI or environment variables.
+
+### File Structure
+
+.
+├── vpc.tf
+├── ec2.tf
+├── elasticache.tf
+├── s3.tf
+└── provider.tf
+
+## Cautionary Notes
+
+- Always verify AWS resource limits to ensure you can provision the desired resources.
+- Familiarize yourself with AWS's pricing model to avoid unexpected costs.
+- Remember to destroy resources post-testing to avoid unnecessary AWS charges.
+
 ## Troubleshooting
 
-If you encounter any issues, please refer to the Jenkins console output for detailed logs. It provides insight into each step of the pipeline and can be invaluable for debugging.
-
----
-
-For any additional queries or support, please raise an issue in this repository or contact the maintainers.
-
-```
-
-```
+If you encounter any issues, please refer to the interviewer to clarifications.

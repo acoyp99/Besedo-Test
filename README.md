@@ -297,7 +297,7 @@ To accomplish the deployment process there is necessary to provision two other r
 ├── s3.tf
 └── provider.tf
 
-## Cautionary Notes
+### Cautionary Notes
 
 - Always verify AWS resource limits to ensure you can provision the desired resources.
 - Familiarize yourself with AWS's pricing model to avoid unexpected costs.

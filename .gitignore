@@ -10,3 +10,4 @@ roles
 .gitignore
 jenkins
 *.pem
+*.terraform*

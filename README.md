@@ -12,7 +12,7 @@ Below are detailed explanations, diagrams, code examples, and steps to follow fo
 
 ---
 
-## CI/CD Pipeline
+# CI/CD Pipeline
 
 This repository contains the codebase and Jenkins pipeline configuration to implement a CI/CD flow including the following stages:
 
@@ -78,24 +78,25 @@ This stage provides an option to rollback Frontend and/or Backend deployments to
 
 **Disclaimer**: This Jenkinsfile is intended as a sample and may require adjustments to fit your specific needs. Always thoroughly review and test pipeline code before running it in a production environment.
 
-## Containerization
+# Containerization
 
 Deploy a multi-container application comprising the `Ariane` frontend, `Falcon` backend, and `Redis` using Docker and Kubernetes.
 
-### Prerequisites
+## Prerequisites
 
 - **Docker**: Ensure [Docker](https://docs.docker.com/get-docker/) is installed.
 - **Kubernetes Cluster**: Have a cluster up and `kubectl` set up.
 - **Git**: For repository cloning.
 
-#### Ariane Frontend
+## Dockerization
 
-1. Clone the frontend repository
+1. Clone the the repositories
 
 git clone https://github.com/slgevens/example-ariane.git
-cd example-ariane
+git clone https://github.com/slgevens/example-falcon.git
 
-To deploy functionally this code there were some changes regarding to the backend integration due to there was not any. This can be demonstrated on the [app.js](frontend-ariane/app.js) file
+> [!IMPORTANT]
+> To deploy functionally the frontend app integrated with backend app there were some changes regarding to the backend integration onto Frontend code. This can be demonstrated on the [app.js](frontend-ariane/app.js) file
 
 2. Develop the Dockerfile Script for all apps as is shown:
    **Frontend Ariane**
@@ -144,7 +145,7 @@ To accomplish properly the Dockerization there are some considerations to have:
 - The platform definition is required
 - The port must be taken into account for the Kubernetes part
 
-### Kubernetes Deployment
+## Kubernetes Deployment
 
 The configuration to proceed to the deployment is shown in the next architecture where the cluster is going to be configured in **2 ec2 servers** as was required in the [Infrastructure as Code](#infrastructure-as-code) part and a **Master Node** which will manage the Kubernetes deployment.
 ![Alt text](assets/architecture.png)
@@ -222,15 +223,11 @@ users:
 - `server`: The server URL is where your Kubernetes API server is running. If you're running the API server on an **EC2 instance with an Elastic IP**, replace **YOUR_ELASTIC_IP** with the actual IP.
 - `client-certificate-data` & `client-key-data`: These are used for client authentication against the server. They also need to be **base64** encoded.
 
-## Incident Response Scenario
-
-For this requirement there is a drafted document in the solution folder addressed as README.md [incident-response-scenario](steps-to-solve-incident/README.md)
-
-## Infrastructure as Code
+# Infrastructure as Code
 
 This Terraform setup provisions infrastructure on AWS with a specific focus on VPC, EC2, Elasticache, and S3 configurations.
 
-## Infrastructure Components
+### Infrastructure Components
 
 - **VPC**:
 
@@ -289,7 +286,7 @@ To accomplish the deployment process there is necessary to provision two other r
 - Familiarize yourself with AWS's pricing model to avoid unexpected costs.
 - Remember to destroy resources post-testing to avoid unnecessary AWS charges.
 
-## Provisioning (Ansible Playbook)
+# Provisioning (Ansible Playbook)
 
 To accomplish the requirement the tool to be used will be **Ansible playbook** automates several system configurations and tasks including:
 
@@ -339,6 +336,10 @@ To accomplish the requirement the tool to be used will be **Ansible playbook** a
 - Ensure your target hosts are correctly specified in the Ansible hosts file.
 - Always review and adjust the playbook and roles to better fit your specific environment and requirements.
 - It's recommended to test the playbook in a staging environment before deploying in production.
+
+# Incident Response Scenario
+
+For this requirement there is a drafted document in the solution folder addressed as README.md [incident-response-scenario](steps-to-solve-incident/README.md)
 
 ## Troubleshooting
 

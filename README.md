@@ -14,7 +14,10 @@ Below are detailed explanations, diagrams, code examples, and steps to follow fo
 
 # CI/CD Pipeline
 
-This repository contains the codebase and Jenkins pipeline configuration to implement a CI/CD flow including the following stages:
+This repository contains the codebase and Jenkins pipeline configuration to implement a CI/CD flow as is shown bellow:
+![Alt text](assets/jenkins_schema.png)
+
+Including the following stages:
 
 ### Environment Variables
 

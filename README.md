@@ -98,7 +98,7 @@ git clone https://github.com/slgevens/example-ariane.git
 git clone https://github.com/slgevens/example-falcon.git
 
 > [!IMPORTANT]
-> To deploy functionally the frontend app integrated with backend app there were some changes regarding to the backend integration onto Frontend code. This can be demonstrated on the [app.js](frontend-ariane/app.js) file
+> To deploy functionally the frontend app integrated with backend app there were some changes regarding to the backend integration onto Frontend code. This can be demonstrated on the [app.js](./frontend-ariane/app.js) file
 
 2. Develop the Dockerfile Script for all apps as is shown:
    **Frontend Ariane**

@@ -16,81 +16,67 @@ Below are detailed explanations, diagrams, code examples, and steps to follow fo
 
 This repository contains the codebase and Jenkins pipeline configuration to implement a CI/CD flow including the following stages:
 
-- Compilation and Testing
-- Building Docker images and pushing them to ECR
-- Deploying the application on a Kubernetes cluster
+### Environment Variables
 
-### Prerequisites
+- `KUBECONFIG_PATH`: The path to the Kubernetes configuration file.
 
-Before you start replicating the Jenkins execution, ensure you have the following prerequisites:
+### Parameters
 
-1. **Jenkins**:
+- `AWS_CREDENTIALS_ID`: The AWS Credentials ID for accessing AWS services like ECR.
+- `ECR_REGISTRY`: The URL for the AWS ECR registry.
+- `AWS_REGION_CHOICE`: A dropdown list for selecting the AWS region.
+- `AWS_REGION_CUSTOM`: A field for entering a custom AWS region if "Other (please specify)" is selected in the dropdown list.
 
-   - Install Jenkins on a server or local machine. [Official Jenkins Installation Guide](https://www.jenkins.io/doc/book/installing/)
-   - Ensure you have the required plugins installed:
-     - Docker Pipeline
-     - Kubernetes Continuous Deploy
-     - Amazon ECR
-     - AWS Steps
-     - Pipeline
+### Stages
 
-2. **AWS Account**:
+#### 1. Determine AWS Region
 
-   - You need an active AWS account.
-   - Set up AWS CLI with the required permissions. [AWS CLI Setup Guide](https://aws.amazon.com/cli/)
+This stage sets the AWS region based on the choice or custom input from the user.
 
-3. **Kubernetes Cluster**:
+#### 2. Compilation & Tests
 
-   - Have a running Kubernetes cluster.
-   - `kubectl` command-line tool installed and configured to interact with your cluster.
+This stage performs compilation and testing of the Frontend and Backend in parallel.
 
-4. **Docker**:
-   - Ensure Docker is installed on the machine where Jenkins is running. [Docker Installation Guide](https://docs.docker.com/get-docker/)
+##### Frontend Compilation & Tests
 
-### Pipeline Overview
+- Installs the Frontend dependencies and runs tests.
 
-1. **Compilation and Test**:
+##### Backend Compilation & Tests
 
-   - The code is compiled.
-   - Tests are executed to ensure functionality.
+- Installs the Backend dependencies and runs tests.
 
-2. **Docker Build and Push**:
+#### 3. Docker Build & Push
 
-   - Docker images are built from the codebase.
-   - Images are pushed to Amazon Elastic Container Registry (ECR).
+This stage builds and pushes Docker images for the Frontend and Backend to the AWS ECR registry.
 
-3. **Deploy with Kubernetes**:
-   - The application is deployed to a Kubernetes cluster using the images in ECR.
+- Logs into the AWS ECR registry.
+- Builds and pushes the Frontend and Backend Docker images based on their respective `VERSION` files.
 
-### Configurations Needed to Replicate Jenkins Execution
+#### 4. Deploy on Kubernetes
 
-1. **Jenkins Configuration**:
+This stage deploys the Frontend and Backend on a Kubernetes cluster.
 
-   - Set up your Jenkins to have the required environment variables, namely `AWS_CREDENTIALS_ID` and `ECR_REGISTRY`.
-   - Add your AWS credentials in Jenkins credentials manager with the ID `AWS_CREDENTIALS_ID`.
+- Deploys a Redis container if not already deployed.
+- Deploys Frontend and Backend containers.
 
-2. **Pipeline Configuration**:
+#### 5. Rollback Option
 
-   - In the Jenkins dashboard, create a new pipeline job.
-   - Point it to the `Jenkinsfile` in this repository.
-   - When prompted, provide the required parameters (`AWS_REGION_CHOICE`, `AWS_REGION_CUSTOM`).
+This stage provides an option to rollback Frontend and/or Backend deployments to a previous version.
 
-3. **AWS Configuration**:
+### How to Use
 
-   - Ensure the ECR repository exists. The Jenkins pipeline will attempt to create it if it doesn't.
-   - Ensure your AWS user has permissions for ECR and other necessary AWS services.
+1. Ensure that the necessary credentials for AWS and Kubernetes are configured in Jenkins.
+2. Set up your AWS ECR registry and add the URL to the `ECR_REGISTRY` parameter.
+3. Add the path to your Kubernetes config file in the `KUBECONFIG_PATH` environment variable.
+4. Execute the Jenkins pipeline and provide the necessary parameters.
 
-4. **Kubernetes Configuration**:
-   - Ensure your `kubectl` is set up correctly to point to your cluster.
-   - Store your kubeconfig in a location that Jenkins can access, and update the `KUBECONFIG_PATH` environment variable in the `Jenkinsfile` accordingly.
+### Additional Notes
 
-### Execution
+- Make sure the `VERSION` file exists in both the Frontend and Backend directories.
+- Ensure that the Kubernetes deployment files (`kubernetes-deployment.yaml`) are in the correct directories for Frontend and Backend.
+- For rollbacks, the pipeline is configured to roll back to version `v1` of the Frontend and Backend. Update this as needed.
 
-Once all configurations are in place:
-
-1. Trigger the Jenkins pipeline either by a push to the repository or manually via the Jenkins dashboard.
-2. Monitor the pipeline's progress in the Jenkins dashboard.
-3. Once completed, verify the deployment in the Kubernetes cluster and the correct endpoint response with the elastic IP provided.
+**Disclaimer**: This Jenkinsfile is intended as a sample and may require adjustments to fit your specific needs. Always thoroughly review and test pipeline code before running it in a production environment.
 
 ## Containerization
 

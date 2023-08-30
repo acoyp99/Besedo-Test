@@ -2,11 +2,11 @@
 
 This repository provides solutions for the technical test, covering the following aspects:
 
-- Containerization
-- CI/CD
-- Infrastructure as Code
-- Provisioning
-- Incident Response
+- [CI/CD Pipeline](#cicd-pipeline)
+- [Containerization](#containerization)
+- [Infrastructure as Code](#infrastructure-as-code)
+- [Provisioning](#provisioning-ansible-playbook)
+- [Incident Response](#incident-response-scenario)
 
 Below are detailed explanations, diagrams, code examples, and steps to follow for each section.
 
@@ -77,6 +77,8 @@ This stage provides an option to rollback Frontend and/or Backend deployments to
 - For rollbacks, the pipeline is configured to roll back to version `v1` of the Frontend and Backend. Update this as needed.
 
 **Disclaimer**: This Jenkinsfile is intended as a sample and may require adjustments to fit your specific needs. Always thoroughly review and test pipeline code before running it in a production environment.
+
+---
 
 # Containerization
 
@@ -223,6 +225,8 @@ users:
 - `server`: The server URL is where your Kubernetes API server is running. If you're running the API server on an **EC2 instance with an Elastic IP**, replace **YOUR_ELASTIC_IP** with the actual IP.
 - `client-certificate-data` & `client-key-data`: These are used for client authentication against the server. They also need to be **base64** encoded.
 
+---
+
 # Infrastructure as Code
 
 This Terraform setup provisions infrastructure on AWS with a specific focus on VPC, EC2, Elasticache, and S3 configurations.
@@ -285,6 +289,8 @@ To accomplish the deployment process there is necessary to provision two other r
 - Always verify AWS resource limits to ensure you can provision the desired resources.
 - Familiarize yourself with AWS's pricing model to avoid unexpected costs.
 - Remember to destroy resources post-testing to avoid unnecessary AWS charges.
+
+---
 
 # Provisioning (Ansible Playbook)
 

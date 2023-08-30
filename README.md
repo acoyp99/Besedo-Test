@@ -2,114 +2,103 @@
 
 This repository provides solutions for the technical test, covering the following aspects:
 
-- Containerization
-- CI/CD
-- Infrastructure as Code
-- Provisioning
-- Incident Response
+- [CI/CD Pipeline](#cicd-pipeline)
+- [Containerization](#containerization)
+- [Infrastructure as Code](#infrastructure-as-code)
+- [Provisioning](#provisioning-ansible-playbook)
+- [Incident Response](#incident-response-scenario)
 
 Below are detailed explanations, diagrams, code examples, and steps to follow for each section.
 
 ---
 
-## CI/CD Pipeline
+# CI/CD Pipeline
 
 This repository contains the codebase and Jenkins pipeline configuration to implement a CI/CD flow including the following stages:
 
-- Compilation and Testing
-- Building Docker images and pushing them to ECR
-- Deploying the application on a Kubernetes cluster
+### Environment Variables
 
-### Prerequisites
+- `KUBECONFIG_PATH`: The path to the Kubernetes configuration file.
 
-Before you start replicating the Jenkins execution, ensure you have the following prerequisites:
+### Parameters
 
-1. **Jenkins**:
+- `AWS_CREDENTIALS_ID`: The AWS Credentials ID for accessing AWS services like ECR.
+- `ECR_REGISTRY`: The URL for the AWS ECR registry.
+- `AWS_REGION_CHOICE`: A dropdown list for selecting the AWS region.
+- `AWS_REGION_CUSTOM`: A field for entering a custom AWS region if "Other (please specify)" is selected in the dropdown list.
 
-   - Install Jenkins on a server or local machine. [Official Jenkins Installation Guide](https://www.jenkins.io/doc/book/installing/)
-   - Ensure you have the required plugins installed:
-     - Docker Pipeline
-     - Kubernetes Continuous Deploy
-     - Amazon ECR
-     - AWS Steps
-     - Pipeline
+### Stages
 
-2. **AWS Account**:
+#### 1. Determine AWS Region
 
-   - You need an active AWS account.
-   - Set up AWS CLI with the required permissions. [AWS CLI Setup Guide](https://aws.amazon.com/cli/)
+This stage sets the AWS region based on the choice or custom input from the user.
 
-3. **Kubernetes Cluster**:
+#### 2. Compilation & Tests
 
-   - Have a running Kubernetes cluster.
-   - `kubectl` command-line tool installed and configured to interact with your cluster.
+This stage performs compilation and testing of the Frontend and Backend in parallel.
 
-4. **Docker**:
-   - Ensure Docker is installed on the machine where Jenkins is running. [Docker Installation Guide](https://docs.docker.com/get-docker/)
+##### Frontend Compilation & Tests
 
-### Pipeline Overview
+- Installs the Frontend dependencies and runs tests.
 
-1. **Compilation and Test**:
+##### Backend Compilation & Tests
 
-   - The code is compiled.
-   - Tests are executed to ensure functionality.
+- Installs the Backend dependencies and runs tests.
 
-2. **Docker Build and Push**:
+#### 3. Docker Build & Push
 
-   - Docker images are built from the codebase.
-   - Images are pushed to Amazon Elastic Container Registry (ECR).
+This stage builds and pushes Docker images for the Frontend and Backend to the AWS ECR registry.
 
-3. **Deploy with Kubernetes**:
-   - The application is deployed to a Kubernetes cluster using the images in ECR.
+- Logs into the AWS ECR registry.
+- Builds and pushes the Frontend and Backend Docker images based on their respective `VERSION` files.
 
-### Configurations Needed to Replicate Jenkins Execution
+#### 4. Deploy on Kubernetes
 
-1. **Jenkins Configuration**:
+This stage deploys the Frontend and Backend on a Kubernetes cluster.
 
-   - Set up your Jenkins to have the required environment variables, namely `AWS_CREDENTIALS_ID` and `ECR_REGISTRY`.
-   - Add your AWS credentials in Jenkins credentials manager with the ID `AWS_CREDENTIALS_ID`.
+- Deploys a Redis container if not already deployed.
+- Deploys Frontend and Backend containers.
 
-2. **Pipeline Configuration**:
+#### 5. Rollback Option
 
-   - In the Jenkins dashboard, create a new pipeline job.
-   - Point it to the `Jenkinsfile` in this repository.
-   - When prompted, provide the required parameters (`AWS_REGION_CHOICE`, `AWS_REGION_CUSTOM`).
+This stage provides an option to rollback Frontend and/or Backend deployments to a previous version.
 
-3. **AWS Configuration**:
+### How to Use
 
-   - Ensure the ECR repository exists. The Jenkins pipeline will attempt to create it if it doesn't.
-   - Ensure your AWS user has permissions for ECR and other necessary AWS services.
+1. Ensure that the necessary credentials for AWS and Kubernetes are configured in Jenkins.
+2. Set up your AWS ECR registry and add the URL to the `ECR_REGISTRY` parameter.
+3. Add the path to your Kubernetes config file in the `KUBECONFIG_PATH` environment variable.
+4. Execute the Jenkins pipeline and provide the necessary parameters.
 
-4. **Kubernetes Configuration**:
-   - Ensure your `kubectl` is set up correctly to point to your cluster.
-   - Store your kubeconfig in a location that Jenkins can access, and update the `KUBECONFIG_PATH` environment variable in the `Jenkinsfile` accordingly.
+### Additional Notes
 
-### Execution
+- Make sure the `VERSION` file exists in both the Frontend and Backend directories.
+- Ensure that the Kubernetes deployment files (`kubernetes-deployment.yaml`) are in the correct directories for Frontend and Backend.
+- For rollbacks, the pipeline is configured to roll back to version `v1` of the Frontend and Backend. Update this as needed.
 
-Once all configurations are in place:
+**Disclaimer**: This Jenkinsfile is intended as a sample and may require adjustments to fit your specific needs. Always thoroughly review and test pipeline code before running it in a production environment.
 
-1. Trigger the Jenkins pipeline either by a push to the repository or manually via the Jenkins dashboard.
-2. Monitor the pipeline's progress in the Jenkins dashboard.
-3. Once completed, verify the deployment in the Kubernetes cluster and the correct endpoint response with the elastic IP provided.
+---
 
-## Containerization
+# Containerization
 
 Deploy a multi-container application comprising the `Ariane` frontend, `Falcon` backend, and `Redis` using Docker and Kubernetes.
 
-### Prerequisites
+## Prerequisites
 
 - **Docker**: Ensure [Docker](https://docs.docker.com/get-docker/) is installed.
 - **Kubernetes Cluster**: Have a cluster up and `kubectl` set up.
 - **Git**: For repository cloning.
 
-#### Ariane Frontend
+## Dockerization
 
-1. Clone the frontend repository
+1. Clone the the repositories
 
 git clone https://github.com/slgevens/example-ariane.git
-cd example-ariane
+git clone https://github.com/slgevens/example-falcon.git
 
-To deploy functionally this code there were some changes regarding to the backend integration due to there was not any. This can be demonstrated on the [app.js](frontend-ariane/app.js) file
+> [!IMPORTANT]
+> To deploy functionally the frontend app integrated with backend app there were some changes regarding to the backend integration onto Frontend code. This can be demonstrated on the [app.js](./frontend-ariane/app.js) file
 
 2. Develop the Dockerfile Script for all apps as is shown:
    **Frontend Ariane**
@@ -158,7 +147,7 @@ To accomplish properly the Dockerization there are some considerations to have:
 - The platform definition is required
 - The port must be taken into account for the Kubernetes part
 
-### Kubernetes Deployment
+## Kubernetes Deployment
 
 The configuration to proceed to the deployment is shown in the next architecture where the cluster is going to be configured in **2 ec2 servers** as was required in the [Infrastructure as Code](#infrastructure-as-code) part and a **Master Node** which will manage the Kubernetes deployment.
 ![Alt text](assets/architecture.png)
@@ -236,15 +225,13 @@ users:
 - `server`: The server URL is where your Kubernetes API server is running. If you're running the API server on an **EC2 instance with an Elastic IP**, replace **YOUR_ELASTIC_IP** with the actual IP.
 - `client-certificate-data` & `client-key-data`: These are used for client authentication against the server. They also need to be **base64** encoded.
 
-## Incident Response Scenario
+---
 
-For this requirement there is a drafted document in the solution folder addressed as README.md [incident-response-scenario](steps-to-solve-incident/README.md)
-
-## Infrastructure as Code
+# Infrastructure as Code
 
 This Terraform setup provisions infrastructure on AWS with a specific focus on VPC, EC2, Elasticache, and S3 configurations.
 
-## Infrastructure Components
+### Infrastructure Components
 
 - **VPC**:
 
@@ -303,7 +290,9 @@ To accomplish the deployment process there is necessary to provision two other r
 - Familiarize yourself with AWS's pricing model to avoid unexpected costs.
 - Remember to destroy resources post-testing to avoid unnecessary AWS charges.
 
-## Provisioning (Ansible Playbook)
+---
+
+# Provisioning (Ansible Playbook)
 
 To accomplish the requirement the tool to be used will be **Ansible playbook** automates several system configurations and tasks including:
 
@@ -353,6 +342,10 @@ To accomplish the requirement the tool to be used will be **Ansible playbook** a
 - Ensure your target hosts are correctly specified in the Ansible hosts file.
 - Always review and adjust the playbook and roles to better fit your specific environment and requirements.
 - It's recommended to test the playbook in a staging environment before deploying in production.
+
+# Incident Response Scenario
+
+For this requirement there is a drafted document in the solution folder addressed as README.md [incident-response-scenario](steps-to-solve-incident/README.md)
 
 ## Troubleshooting
 

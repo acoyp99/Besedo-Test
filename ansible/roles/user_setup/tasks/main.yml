@@ -4,14 +4,13 @@
     name: "{{ item.login }}"
     password: "{{ item.passwd | password_hash('sha512') }}"
     groups: "{{ item.groups | join(',') }}"
-    generate_ssh_key: yes
-    ssh_key_file: ".ssh/id_rsa"
+    append: yes
   with_dict: "{{ user_accounts }}"
 
-- name: Add SSH keys for users
+- name: Add authorized keys for users
   authorized_key:
-    user: "{{ item.login }}"
-    key: "{{ item.ssh_keys }}"
+    user: "{{ item.key }}"
+    key: "{{ item.value.ssh_keys }}"
   with_dict: "{{ user_accounts }}"
 
 - name: Create info files for users
